@@ -1,0 +1,54 @@
+# Any words after # in a line are just comments
+
+# One file is a test suite. The test suite description
+test_suite: Trial1
+
+# Identify the test bed file, currently .py file is supported
+# similar as 'import testbed.py' in test*.py file
+test_bed: example.test.testbed
+
+# A case starts from a case_idString, the description is in the bracket
+# This is to define one case, just like a function or method in a .py file
+# case_id1 means the function name is "id1"
+case_id1 (NumberBase add function):
+    # under a case, there could be multiple test steps, one step in one line
+    # step format: obj.method(parameters) operator expected_result options
+        # obj/methods are defined in test bed file
+        # operator supports:
+        #   ==(equal to), !=(not equal to), >(larger than), <(less than), >=, <=,
+        #   =~(for string, contains, e.g. "hello world" =~ "llo", regex allowed
+        #   !~ (not contain)
+    num1.add(3,4,5,6) == 23 -t 3
+    num1.add(var1, var2, var3) == 18
+
+case_id2 (NumberBase multiple function):
+    num1.multiple(2,4,5) == 200
+
+case_id3 (NumberChange test):
+    # Every line under the case line is a step of a case
+    # there could be multiple lines; each line follows the format:
+    #   obj.method([parameter1 [,parameter 2 [, ...]]] operator ExpectedValue -options
+    # For details, see guidance ....
+    # options:
+    # --timeout 30 == -t 30: fail if the step could not complete in 30 seconds
+    # --repeat 30 == -r 30: repeat per second if fail until pass, timeout in 30s
+    # --duration 30 == -d 30: duration of the step is 30s, if completed early, just wait until 30s
+    # --expectedfail == -x true == -x: If step fail, then report pass
+    # --skip == -s: just skip this step
+    #
+    num1.add(4)
+    num2.add(3,4,5,6) == 23
+    num2.multiple(4,5) == 460 -x True -t 12 -r 10
+    num3.add(3,4,var2) == 1000 --skip -t 25
+
+case_id4 (Reverse String test):
+    string1.range(1,4) == 'dlr' -d 6
+
+case_async1 (To test async actions - timeout)
+    num_async.addw(var100, var100) == 100
+    num_async.data_sync() -t 15
+    num_async.get_value() == 300
+
+case_async2 (To test async actions - repeat)
+    num_async.addw(var100, var100) >= 300
+    num_async.get_value() == 500 --repeat 20
