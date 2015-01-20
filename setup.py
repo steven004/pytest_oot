@@ -6,7 +6,7 @@ setup(
     description='Run object-oriented tests in a simple format',
     author='Steven LI',
     author_email='steven004@gmail.com',
-    version='0.3.1',
+    version='0.3.2',
     #py_modules = ['pytest_oot'],
     entry_points = {
         'pytest11': [
