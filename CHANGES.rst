@@ -1,11 +1,13 @@
 Changelog
 =========
 
-0.3.1
+
+0.5.0
 -----
 
--
--
+- Big change, use test_steps module to simplify the implementation, oot_step.py is omitted
+- More support of options and operators added.
+- Format is not so strict any more. Each step just follow the format in step function defined in test_steps
 
 
 0.3.0

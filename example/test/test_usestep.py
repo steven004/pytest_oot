@@ -1,7 +1,7 @@
 __author__ = 'Steven LI'
 
 from .testbed import *
-from pytest_oot.oot_step import *
+from test_steps import *
 
 def test_NumBase_add_mulple():
     step("num1.add(3,4,5,6) == 23")

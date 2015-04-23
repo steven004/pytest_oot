@@ -89,13 +89,15 @@
 
 """
 
+
 __author__ = 'Steven LI'
 
-import re
-
+import test_steps
 import pytest
 
-from .oot_step import step, TestStepFail, TestRunTimeError
+
+def pytest_configure(config):
+    test_steps.auto_func_detection(False)
 
 
 def pytest_collect_file(parent, path):
@@ -181,9 +183,14 @@ class TestCaseItem(pytest.Item):
             #if step_string[0] == '#': continue
             #step_obj = TestStep(step, self) # To create a step_obj with parsing
             #step_obj.execute()
-            step(step_string, self.parent.objs, self)
-            #if step == '': raise TestException(self, self.name, step)
+            test_steps.steps(step_string, self.parent.objs.__dict__)
+
             self.current_step += 1
+
+
+    def runtest_setup(item):
+        test_steps.log_new_func(item.name, str(item.fspath) )
+
 
     def repr_failure(self, excinfo):
         """ called when self.runtest() raises an exception. """
@@ -191,20 +198,22 @@ class TestCaseItem(pytest.Item):
         failed_line_number = self.first_line + self.current_step + 1
 
         fail_string = "case_" + self.case_header + "\n".join(self.steps[0:self.current_step])
-        fail_string += '\n>' + self.steps[self.current_step][1:]
-        fail_string += "\nE" + excinfo.value.args[1][1:]
+        cur_step_str = self.steps[self.current_step]
+#       fail_string += '\n>' + self.steps[self.current_step][1:]
+        fail_string += '\n>' + cur_step_str[1:]
+        fail_string += "\nE" + ' ' * (len(cur_step_str) - len(cur_step_str.lstrip()) - 1) + excinfo.value.args[1]
 
         fail_string += "\n\n%s:" % self.parent.fspath + "%d" % failed_line_number
 
-        if isinstance(excinfo.value, TestStepFail):
-            fail_string += ": TestStepFail"
-
-        elif isinstance(excinfo.value, TestRunTimeError):
-            fail_string += ": TestRunTimeError"
+        # if isinstance(excinfo.value, TestStepFail):
+        #     fail_string += ": TestStepFail"
+        #
+        # elif isinstance(excinfo.value, TestRunTimeError):
+        #     fail_string += ": TestRunTimeError"
+        fail_string += ": " + excinfo.value.__class__.__name__
 
         return fail_string
 
     def reportinfo(self):
         ''' Called when there is a failure as a failed case title'''
         return self.fspath, 0, "%s" % self.case_header
-

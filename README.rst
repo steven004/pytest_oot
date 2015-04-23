@@ -7,20 +7,17 @@ OOT library for the py.test runner
 .. image:: https://pypip.in/d/pytest-oot/badge.png
     :target: https://crate.io/packages/pytest-oot/
 
-pytest-oot implements a simple way to write a test step for system test engineers.
-It can be used for two ways:
+pytest-oot implements a simple way to write a test step for test engineers.
 
-- To directly use step() functions in a test_*.py file to reduce code lines
-- To directly write a test_*.oot file to use a simple case/step language
+This plug-in use test_steps module to implement the whole things. While using this plug-in,
+you do not need pytest-autochecklog any more. All functions have been included.
 
-The module is still under development. The following features will be added in:
+The test engineer can simply create test_*.oot file to use a simple case/step language,
+by using the operators and options defined in test_steps module, or user-defined by you.
 
-- A hook to register logging for both pass/fail steps or cases
-- Implement the mix-scripting in case file by using both python language and oot case/step format
-- A hook to add new operators to enhance the conditions judgement
-- A hook to add more options for steps
+For detailed operators and options for steps, please refer to test_steps module.
 
-You can download the whole package to get the examples
+https://pypi.python.org/pypi?:action=display&name=test_steps
 
 
 
@@ -32,22 +29,122 @@ Install pytest-oot
     pip install pytest-oot
 
 
+
+Example for test_*.oot file
+---------------------------
+
+Once the plug-in is installed, the pytest will automatically collect test_*.oot files
+to get cases, and run each items in the files. In a test_*.oot file, each case is
+a test item, and each line under it is a test step.
+
+
+Example file: test_number.oot (you can get it from the source package)
+----------------------------------------------------------------------
+
+A step is like     expression1 [ op expression2  [options] ]
+
+.. code-block:: python
+
+    # Any words after # in a line are just comments
+    # One file is a test suite. The test suite description
+    test_suite: Trial1
+
+    # Identify the test bed file, currently .py file is supported
+    # similar as 'import testbed.py' in test*.py file
+    test_bed: example.test.testbed
+
+    # A case starts from a case_idString, the description is in the bracket
+    # This is to define one case, just like a function or method in a .py file
+    # case_id1 means the function name is "id1"
+    case_id1 (NumberBase add function):
+        # under a case, there could be multiple test steps, one step in one line
+        # step format: obj.method(parameters) operator expected_result options
+            # obj/methods are defined in test bed file
+            # operator supports:
+            #   ==(equal to), !=(not equal to), >(larger than), <(less than), >=, <=,
+            #   =~(for string, contains, e.g. "hello world" =~ "llo", regex allowed
+            #   !~ (not contain)
+        # the following step is just like:
+        #   checks( "num1.add(3,4,5,6) == 23 -t 3" )
+        # in a python file, in which test_steps module is used.
+        num1.add(3,4,5,6) == 23 -t 3
+        num1.add(var1, var2, var3) == 18
+
+    case_id2 (NumberBase multiple function):
+        num1.multiple(2,4,5) == 200
+
+    case_id3 (NumberChange test):
+        # Every line under the case line is a step of a case
+        # there could be multiple lines; each line follows the format:
+        #   obj.method([parameter1 [,parameter 2 [, ...]]] operator ExpectedValue -options
+        # For details, see guidance ....
+        # options:
+        # --timeout 30 == -t 30: fail if the step could not complete in 30 seconds
+        # --repeat 30 == -r 30: repeat per second if fail until pass, timeout in 30s
+        # --duration 30 == -d 30: duration of the step is 30s, if completed early, just wait until 30s
+        # --expectedfail == -x true == -x: If step fail, then report pass
+        # --skip == -s: just skip this step
+        #
+        num1.add(4)
+        num2.add(3,4,5,6) == 23
+        num2.multiple(4,5) == 460 -x True -t 12 -r 10
+        num3.add(3,4,var2) == 1000 --skip -t 25
+
+    case_id4 (Reverse String test):
+        string1.range(1,4) == 'dlr' -d 6
+
+    case_async1 (To test async actions - timeout)
+        num_async.addw(var100, var100) == 100
+        num_async.data_sync() -t 18
+        num_async.get_value() == 300
+
+    case_async2 (To test async actions - repeat)
+        num_async.addw(var100, var100) >= 300
+        num_async.get_value() == 500 --repeat 20
+
+Note: the testbed file is a python file, which define all the variables and objects to be used in the test.
+If it reports the testbed module could not be imported, please change the module path
+to make it right.
+
+
+Operators & Options
+-------------------
+
+Supported Operators by default:
+    == (eq), != (ne), < (lt), > (gt), <= (le), >=(ge), =~(match), !~(unmatch), =>(has), !>(hasnt)
+Again, all operators defined in test_steps are supported, and you can also define them by yourself.
+
+
+Supported Options by default::
+
+    -t 30   or --timeout 30    in checks()             means       timeout=30    in check()
+    -r 10   or --repeat  10    in checks()             means       repeat=10
+    -d 10   or --duration 10                          means       duration=10
+    -x  or --xfail or -x True or --xfail True         means       xfail=True
+    -w  or --warning  or -w True  or --warning True   means       warning=True
+    -s  or --skip     or -s True  or --skip True      means       skip=True
+    -e MyException                                    means       exception=MyException
+    -p pass_str or --passdesc pass_str                means       passdesc=pass_str
+    -f fail_str or --faildesc fail_str                means       faildesc=fail_str
+
+
+Test bed
+--------
+
+If you are using a test_*.oot file, you need to use::
+
+    testbed = [module.]testbedfilename
+
+to import all the objects defined in the testbedfilename.py file.
+
+
+
 Example for using step functions in a test_*.py
 -----------------------------------------------
 
+Please refer to test_steps module.
 This is an easy way to use it, and options provide some tests specific functions.
-The step functions include step(), steps() and s().
-The format of a step looks like::
-
-    obj.method(parameter) op exp-value options
-
-In this one step, there is an action, and also a check point
-This one step can be translated to multiple lines of python code,
-or dozens lines of code if there is one option or multiple options.
-
-How to import::
-
-    from pytest_oot.oot_step import step, steps, s
+There is no difference than using test_steps directly. Simple guidance below:
 
 
 Examples (Quick Start):
@@ -146,76 +243,6 @@ Examples (Quick Start):
         ''')
 
 
-Example for test_*.oot file
----------------------------
-
-Once the plug-in is installed, the pytest will automatically collect test_*.oot files
-to get cases, and run each items in the files. In a test_*.oot file, each case is
-a test item, and each line under it is a test step.
-
-
-Example file: test_number.oot (you can get it from the source package)
-----------------------------------------------------------------------
-
-.. code-block:: python
-
-    # Any words after # in a line are just comments
-    # One file is a test suite. The test suite description
-    test_suite: Trial1
-
-    # Identify the test bed file, currently .py file is supported
-    # similar as 'import testbed.py' in test*.py file
-    test_bed: example.test.testbed
-
-    # A case starts from a case_idString, the description is in the bracket
-    # This is to define one case, just like a function or method in a .py file
-    # case_id1 means the function name is "id1"
-    case_id1 (NumberBase add function):
-        # under a case, there could be multiple test steps, one step in one line
-        # step format: obj.method(parameters) operator expected_result options
-            # obj/methods are defined in test bed file
-            # operator supports:
-            #   ==(equal to), !=(not equal to), >(larger than), <(less than), >=, <=,
-            #   =~(for string, contains, e.g. "hello world" =~ "llo", regex allowed
-            #   !~ (not contain)
-        num1.add(3,4,5,6) == 23 -t 3
-        num1.add(var1, var2, var3) == 18
-
-    case_id2 (NumberBase multiple function):
-        num1.multiple(2,4,5) == 200
-
-    case_id3 (NumberChange test):
-        # Every line under the case line is a step of a case
-        # there could be multiple lines; each line follows the format:
-        #   obj.method([parameter1 [,parameter 2 [, ...]]] operator ExpectedValue -options
-        # For details, see guidance ....
-        # options:
-        # --timeout 30 == -t 30: fail if the step could not complete in 30 seconds
-        # --repeat 30 == -r 30: repeat per second if fail until pass, timeout in 30s
-        # --duration 30 == -d 30: duration of the step is 30s, if completed early, just wait until 30s
-        # --expectedfail == -x true == -x: If step fail, then report pass
-        # --skip == -s: just skip this step
-        #
-        num1.add(4)
-        num2.add(3,4,5,6) == 23
-        num2.multiple(4,5) == 460 -x True -t 12 -r 10
-        num3.add(3,4,var2) == 1000 --skip -t 25
-
-    case_id4 (Reverse String test):
-        string1.range(1,4) == 'dlr' -d 6
-
-    case_async1 (To test async actions - timeout)
-        num_async.addw(var100, var100) == 100
-        num_async.data_sync() -t 18
-        num_async.get_value() == 300
-
-    case_async2 (To test async actions - repeat)
-        num_async.addw(var100, var100) >= 300
-        num_async.get_value() == 500 --repeat 20
-
-Note: If it reports the testbed module could not be imported, please change the module path
-to make it right.
-
 
 
 Operators & Options
@@ -241,10 +268,7 @@ Supported Options by default::
 Test bed
 --------
 
-If you use step functions in a .py file, it is required to make sure the objects in the step string
-are in the module's name space.
-
-If you are using a test_*.oot file, you need to use::
+In a test_*.oot file, you need to use::
 
     testbed = [module.]testbedfilename
 
@@ -265,5 +289,5 @@ License
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_.
 
-© 2014 Steven LI
+© 2014 - 2015 Steven LI
 
