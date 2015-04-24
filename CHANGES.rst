@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.5.6
+-----
+
+- Fix the log-new-func issue.
+
 
 0.5.0
 -----

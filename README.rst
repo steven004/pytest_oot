@@ -15,9 +15,9 @@ you do not need pytest-autochecklog any more. All functions have been included.
 The test engineer can simply create test_*.oot file to use a simple case/step language,
 by using the operators and options defined in test_steps module, or user-defined by you.
 
-For detailed operators and options for steps, please refer to test_steps module.
+For detailed operators and options for steps, please refer to test_steps module:
+    https://pypi.python.org/pypi?:action=display&name=test_steps
 
-https://pypi.python.org/pypi?:action=display&name=test_steps
 
 
 
@@ -38,10 +38,9 @@ to get cases, and run each items in the files. In a test_*.oot file, each case i
 a test item, and each line under it is a test step.
 
 
+
 Example file: test_number.oot (you can get it from the source package)
 ----------------------------------------------------------------------
-
-A step is like     expression1 [ op expression2  [options] ]
 
 .. code-block:: python
 
@@ -112,6 +111,7 @@ Operators & Options
 
 Supported Operators by default:
     == (eq), != (ne), < (lt), > (gt), <= (le), >=(ge), =~(match), !~(unmatch), =>(has), !>(hasnt)
+
 Again, all operators defined in test_steps are supported, and you can also define them by yourself.
 
 
@@ -131,7 +131,9 @@ Supported Options by default::
 Test bed
 --------
 
-If you are using a test_*.oot file, you need to use::
+If you are using a test_*.oot file, you need to use
+
+::
 
     testbed = [module.]testbedfilename
 
@@ -244,39 +246,6 @@ Examples (Quick Start):
 
 
 
-
-Operators & Options
--------------------
-
-Sometimes it is needed to declare the same fixtures or steps with the
-different names for better readability. In order to use the same step
-
-Supported Operators by default:
-    ==, !=, <. >, <=, >=, =~, !~
-
-Supported Options by default::
-
-    # --timeout 30 == -t 30: fail if the step could not complete in 30 seconds
-    # --repeat 30 == -r 30: repeat per second if fail until pass, timeout in 30s
-    # --duration 30 == -d 30: duration of the step is 30s, if completed early,
-      just wait until 30s
-    # --expectedfail == -x true == -x: If step fail, then report pass
-    # --skip == -s: just skip this step
-
-
-
-Test bed
---------
-
-In a test_*.oot file, you need to use::
-
-    testbed = [module.]testbedfilename
-
-to import all the objects defined in the testbedfilename.py file.
-
-
-
-
 Hooks
 -----
 
@@ -289,5 +258,5 @@ License
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_.
 
-© 2014 - 2015 Steven LI
+© 2015 Steven LI
 

@@ -100,6 +100,10 @@ def pytest_configure(config):
     test_steps.auto_func_detection(False)
 
 
+def pytest_runtest_setup(item):
+    test_steps.log_new_func(item.name, str(item.fspath) )
+
+
 def pytest_collect_file(parent, path):
     if path.ext == ".oot" and path.basename.startswith("test"):
         return TestCaseFile(path, parent)
@@ -187,9 +191,6 @@ class TestCaseItem(pytest.Item):
 
             self.current_step += 1
 
-
-    def runtest_setup(item):
-        test_steps.log_new_func(item.name, str(item.fspath) )
 
 
     def repr_failure(self, excinfo):
