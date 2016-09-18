@@ -117,10 +117,11 @@ class TestCaseFile(pytest.File):
         self.__parse_suite(suite_content)
 
         # Import objects in the test bed
-        if self.test_bed != None:
+        if self.test_bed:
             #self.objs = __import__(self.test_bed, globals())
-            import importlib
-            self.objs = importlib.import_module(self.test_bed)
+            #import importlib
+            #self.objs = importlib.import_module(self.test_bed)
+            self.objs = test_steps.init_testbed(self.test_bed)
 
         current_line_number = 0
         case_number = 0

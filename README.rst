@@ -8,9 +8,7 @@ OOT library for the py.test runner
     :target: https://crate.io/packages/pytest-oot/
 
 pytest-oot implements a simple way to write a test step for test engineers.
-
-This plug-in use test_steps module to implement the whole things. While using this plug-in,
-you do not need pytest-autochecklog any more. All functions have been included.
+This plug-in use test_steps module to implement the whole things.
 
 The test engineer can simply create test_*.oot file to use a simple case/step language,
 by using the operators and options defined in test_steps module, or user-defined by you.
@@ -19,6 +17,8 @@ For detailed operators and options for steps, please refer to test_steps module:
     https://pypi.python.org/pypi?:action=display&name=test_steps
 
 
+Note: while using this plug-in,
+you do not need pytest-autochecklog any more. All functions have been included.
 
 
 Install pytest-oot
@@ -35,7 +35,8 @@ Example for test_*.oot file
 
 Once the plug-in is installed, the pytest will automatically collect test_*.oot files
 to get cases, and run each items in the files. In a test_*.oot file, each case is
-a test item, and each line under it is a test step.
+a test item, and each line under it is a test step. For each test step, the syntax is
+the same as a code string in checks("code string") function defined in test_steps module.
 
 
 
@@ -50,15 +51,17 @@ Example file: test_number.oot (you can get it from the source package)
 
     # Identify the test bed file, currently .py file is supported
     # similar as 'import testbed.py' in test*.py file
-    test_bed: example.test.testbed
+    # .yaml file is support too. You can use: (see more information in TestSteps package)
+    # test_bed: example.test.testbed.yaml
+    test_bed: example.test.testbed.py
 
     # A case starts from a case_idString, the description is in the bracket
     # This is to define one case, just like a function or method in a .py file
     # case_id1 means the function name is "id1"
     case_id1 (NumberBase add function):
         # under a case, there could be multiple test steps, one step in one line
-        # step format: obj.method(parameters) operator expected_result options
-            # obj/methods are defined in test bed file
+        # step format: expression1 operator expression2 options
+            # An expression can use any objects defined in test bed file
             # operator supports:
             #   ==(equal to), !=(not equal to), >(larger than), <(less than), >=, <=,
             #   =~(for string, contains, e.g. "hello world" =~ "llo", regex allowed
@@ -144,9 +147,8 @@ to import all the objects defined in the testbedfilename.py file.
 Example for using step functions in a test_*.py
 -----------------------------------------------
 
-Please refer to test_steps module.
-This is an easy way to use it, and options provide some tests specific functions.
-There is no difference than using test_steps directly. Simple guidance below:
+Of course, you can directly use test_steps functions in your test_*.py test scripts files.
+Please refer to test_steps module for details. Some basic examples as below:
 
 
 Examples (Quick Start):
@@ -155,7 +157,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        step("num1.add(3,4,5) == 23")
+        check("num1.add(3,4,5) == 23")
 
     It is similar as:
 
@@ -171,7 +173,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        step("string1.range(1..4) !~ r'\w\-\w'")
+        check("string1.range(1..4) !~ r'\w\-\w'")
 
     Perl-like condition, =~ means 'contains', and !~ means 'not contains'.
     btw, regex can be used. The step is like:
@@ -185,7 +187,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        step("num_async.data_sync() -t 15")
+        check("num_async.data_sync() -t 15")
 
     A little complicated, -t means timeout. In this step, a time-out timer
     is set to 15 seconds. It means this step is allowed to be completed
@@ -200,7 +202,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        step("num_async.get_value() == 500 --repeat 20")
+        check("num_async.get_value() == 500 --repeat 20")
 
     Another option --repeat (same as -r).
     The step means the step will be re-run every another second
@@ -212,7 +214,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        step("num2.multiple(4,5) == 460 -x True -t 12 -r 10")
+        check("num2.multiple(4,5) == 460 -x True -t 12 -r 10")
 
     Multiple options for one step ::
 
@@ -225,7 +227,7 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-        steps('''
+        checks('''
             num1.add(4)
             num2.add(3,4,5,6) == 23
             num2.multiple(4,5) == 460 -x True -t 12 -r 10
@@ -236,8 +238,8 @@ Examples (Quick Start):
 
     .. code-block:: python
 
-       s("num2.multiple(4,5) == 460 -x True -t 12 -r 10")
-       s('''
+       c("num2.multiple(4,5) == 460 -x True -t 12 -r 10")
+       c('''
             num1.add(4)
             num2.add(3,4,5,6) == 23
             num2.multiple(4,5) == 460 -x True -t 12 -r 10
@@ -245,11 +247,13 @@ Examples (Quick Start):
         ''')
 
 
+Note: each line of the code strings in the checks functions can be a step in test_*.oot file.
+
 
 Hooks
 -----
 
-pytest-oot is to support multiple hooks for operator, logs, and options next.
+pytest-oot is to support multiple hooks for operator, logs, and options, refer to test_steps.
 Please send mails to steven004@gmail.com if you have any comments or suggestions
 
 

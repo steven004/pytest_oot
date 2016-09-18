@@ -5,7 +5,7 @@ test_suite: Trial1
 
 # Identify the test bed file, currently .py file is supported
 # similar as 'import testbed.py' in test*.py file
-test_bed: example.test.testbed
+test_bed: example.test.testbed.py
 
 # A case starts from a case_idString, the description is in the bracket
 # This is to define one case, just like a function or method in a .py file

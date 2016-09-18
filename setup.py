@@ -20,7 +20,7 @@ setup(
         "Topic :: System :: Logging",
         "Programming Language :: Python :: 3"
     ],
-    version='0.5.6',
+    version='0.6.1',
     #py_modules = ['pytest_oot'],
     entry_points = {
         'pytest11': [
@@ -30,6 +30,6 @@ setup(
     url = "https://github.com/steven004/pytest_oot",
     packages = find_packages(),
     include_package_data = True,
-    install_requires = ['py>=1.3.0', 'pytest', 'test_steps>=0.6'],
+    install_requires = ['py>=1.3.0', 'pytest', 'test_steps>=0.8'],
 )
 

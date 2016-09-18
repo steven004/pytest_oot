@@ -6,6 +6,12 @@ Changelog
 
 - Fix the log-new-func issue.
 
+0.6.1
+-----
+
+- Support .yaml test bed file for initialization of all objects defined in a test bed.
+- An example is provided in the example/test folder.
+- See more in the TestSteps package
 
 0.5.0
 -----
