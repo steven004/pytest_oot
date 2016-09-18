@@ -8,25 +8,25 @@ test_bed: example/test/lesson8_testbed_obj.yaml
 # A case starts from a case_idString, the description is in the bracket
 # This is to define one case, just like a function or method in a .py file
 # case_id1 means the function name is "id1"
-case_no_param (Test initialization of a class and functions without parameters):
+case: no_param (Test initialization of a class and functions without parameters):
     obj1
     obj1.ppp()
 
-case_with_param (Test functions with parameters):
+case: with_param (Test functions with parameters):
     obj1.ppp2(3,5) == 8
     obj1.ppp2(100, 20) != 102
     obj1.ppp2(4,6,10) == 20
 
-case_with_param_in_class (Test object initialization with parameters ):
+case: with_param_in_class (Test object initialization with parameters ):
     obj2.get_value() == 17
     obj2.multiple(10) == 170
     obj2.get_value() == 170
 
-case_with_param_in_class2 (More test with strings):
+case: with_param_in_class2 (More test with strings):
     obj3.get_msg() == 'Goodafternoon'
     obj4.get_msg() =~ 'Goodqq'
 
-case_with_index_file (Get information from index file)
+case: with_index_file (Get information from index file)
     obj5.get_value() == 22
     obj6.get_value() == 17
     obj6.get_msg() =~ 'Goodpp' -w

@@ -20,7 +20,7 @@ setup(
         "Topic :: System :: Logging",
         "Programming Language :: Python :: 3"
     ],
-    version='0.6.1',
+    version='0.6.2',
     #py_modules = ['pytest_oot'],
     entry_points = {
         'pytest11': [

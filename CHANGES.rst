@@ -1,10 +1,11 @@
 Changelog
 =========
 
-0.5.6
+0.6.2
 -----
 
-- Fix the log-new-func issue.
+- Support case: (new format for case, and easy for editing in an IDE)
+    and case_ (to back-compatible to previous versions)
 
 0.6.1
 -----
@@ -12,6 +13,11 @@ Changelog
 - Support .yaml test bed file for initialization of all objects defined in a test bed.
 - An example is provided in the example/test folder.
 - See more in the TestSteps package
+
+0.5.6
+-----
+
+- Fix the log-new-func issue.
 
 0.5.0
 -----

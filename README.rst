@@ -58,7 +58,7 @@ Example file: test_number.oot (you can get it from the source package)
     # A case starts from a case_idString, the description is in the bracket
     # This is to define one case, just like a function or method in a .py file
     # case_id1 means the function name is "id1"
-    case_id1 (NumberBase add function):
+    case: id1 (NumberBase add function):
         # under a case, there could be multiple test steps, one step in one line
         # step format: expression1 operator expression2 options
             # An expression can use any objects defined in test bed file
@@ -72,10 +72,10 @@ Example file: test_number.oot (you can get it from the source package)
         num1.add(3,4,5,6) == 23 -t 3
         num1.add(var1, var2, var3) == 18
 
-    case_id2 (NumberBase multiple function):
+    case: id2 (NumberBase multiple function):
         num1.multiple(2,4,5) == 200
 
-    case_id3 (NumberChange test):
+    case: id3 (NumberChange test):
         # Every line under the case line is a step of a case
         # there could be multiple lines; each line follows the format:
         #   obj.method([parameter1 [,parameter 2 [, ...]]] operator ExpectedValue -options
@@ -92,19 +92,23 @@ Example file: test_number.oot (you can get it from the source package)
         num2.multiple(4,5) == 460 -x True -t 12 -r 10
         num3.add(3,4,var2) == 1000 --skip -t 25
 
-    case_id4 (Reverse String test):
+    case: id4 (Reverse String test):
         string1.range(1,4) == 'dlr' -d 6
 
-    case_async1 (To test async actions - timeout)
+    case: async1 (To test async actions - timeout)
         num_async.addw(var100, var100) == 100
         num_async.data_sync() -t 18
         num_async.get_value() == 300
 
-    case_async2 (To test async actions - repeat)
+    case: async2 (To test async actions - repeat)
         num_async.addw(var100, var100) >= 300
         num_async.get_value() == 500 --repeat 20
 
-Note: the testbed file is a python file, which define all the variables and objects to be used in the test.
+Note: the testbed file could be a python file or a .yaml file.
+When it is a .py file, which defines all the variables and objects to be used in the test.
+This plug-in will auto import the .py file for use in cases.
+When it is a .yaml file, please follow the format definition in TestSteps package, basically,
+there could be two levels of .yaml files, object file and index file.
 If it reports the testbed module could not be imported, please change the module path
 to make it right.
 

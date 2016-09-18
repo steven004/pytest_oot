@@ -89,11 +89,11 @@
 
 """
 
-
 __author__ = 'Steven LI'
 
 import test_steps
 import pytest
+import re
 
 
 def pytest_configure(config):
@@ -101,12 +101,13 @@ def pytest_configure(config):
 
 
 def pytest_runtest_setup(item):
-    test_steps.log_new_func(item.name, str(item.fspath) )
+    test_steps.log_new_func(item.name, str(item.fspath))
 
 
 def pytest_collect_file(parent, path):
     if path.ext == ".oot" and path.basename.startswith("test"):
         return TestCaseFile(path, parent)
+
 
 class TestCaseFile(pytest.File):
     # test_bed: the test bed file
@@ -118,15 +119,15 @@ class TestCaseFile(pytest.File):
 
         # Import objects in the test bed
         if self.test_bed:
-            #self.objs = __import__(self.test_bed, globals())
-            #import importlib
-            #self.objs = importlib.import_module(self.test_bed)
+            # self.objs = __import__(self.test_bed, globals())
+            # import importlib
+            # self.objs = importlib.import_module(self.test_bed)
             self.objs = test_steps.init_testbed(self.test_bed)
 
         current_line_number = 0
         case_number = 0
         for case in self.cases:
-            case_id = case[0:case.find(' ')]
+            case_id = case[0:case.find(' ')].lstrip()
             current_line_number += self.case_lines[case_number]
             case_number += 1
             yield TestCaseItem(case_id, self, case, current_line_number)
@@ -138,22 +139,26 @@ class TestCaseFile(pytest.File):
         '''
 
         # split cases, notice that the first element of the cases is about the test suite description
-        cases = suite_content.split("\ncase_")
-        self.case_lines = [c.count('\n')+1 for c in cases]
+        # cases = suite_content.split("\ncase_")
+        cases = re.compile('\n[cC]ase[_:]').split(suite_content)
+        self.case_lines = [c.count('\n') + 1 for c in cases]
 
         # Deal with the test suite description; cases[0] is about the test suite summary
         self.name = 'unknown'
         self.test_bed = None
         self.suite_attr = {}
         self.cases = cases[1:]
+
+        # cases[0] is not a case, actually it's the suite header
         header = cases[0].split("\n")
         for line in header:
             line = line.strip()
             if len(line) == 0: continue
             if line[0] == '#': continue
-            colon = line.find(':')
-            if colon == -1: continue
-            (name, spec) = (line[0:colon], line[colon+1:].strip())
+            colon = line.find(":")
+            if colon == -1:
+                continue   # no ':', it is not a key-value pair, ignore it
+            (name, spec) = (line[0:colon], line[colon + 1:].strip())
             if name == 'test_suite':
                 self.name = spec
             elif name == 'test_bed':
@@ -165,6 +170,7 @@ class TestCaseFile(pytest.File):
 class TestCaseItem(pytest.Item):
     ''' A case structure, one case can contain multiple steps
     '''
+
     # def __init__(self, name, parent, case_dec, steps):
     #     super(TestCaseItem, self).__init__(name, parent)
     #     self.case_dec = case_dec
@@ -177,22 +183,20 @@ class TestCaseItem(pytest.Item):
         self.steps = case_string[header_end:].split('\n')
         self.first_line = line_number
         self.parent = parent
-        #m = re.match(r'(\w+)\s*\((.*)\)', line1)
-        #(case_id, case_dec) = m.group(1,2)
+        # m = re.match(r'(\w+)\s*\((.*)\)', line1)
+        # (case_id, case_dec) = m.group(1,2)
 
     def runtest(self):
         self.current_step = 0
         for step_string in self.steps:
-            #step_string = step_string.strip()
-            #if len(step_string) == 0: continue
-            #if step_string[0] == '#': continue
-            #step_obj = TestStep(step, self) # To create a step_obj with parsing
-            #step_obj.execute()
+            # step_string = step_string.strip()
+            # if len(step_string) == 0: continue
+            # if step_string[0] == '#': continue
+            # step_obj = TestStep(step, self) # To create a step_obj with parsing
+            # step_obj.execute()
             test_steps.steps(step_string, self.parent.objs.__dict__)
 
             self.current_step += 1
-
-
 
     def repr_failure(self, excinfo):
         """ called when self.runtest() raises an exception. """
@@ -201,7 +205,7 @@ class TestCaseItem(pytest.Item):
 
         fail_string = "case_" + self.case_header + "\n".join(self.steps[0:self.current_step])
         cur_step_str = self.steps[self.current_step]
-#       fail_string += '\n>' + self.steps[self.current_step][1:]
+        #       fail_string += '\n>' + self.steps[self.current_step][1:]
         fail_string += '\n>' + cur_step_str[1:]
         fail_string += "\nE" + ' ' * (len(cur_step_str) - len(cur_step_str.lstrip()) - 1) + excinfo.value.args[1]
 
