@@ -1,10 +1,10 @@
 OOT library for the py.test runner
 ==================================
 
-.. image:: https://pypip.in/v/pytest-oot/badge.png
+.. image:: https://img.shields.io/pypi/v/pytest-oot.svg
     :target: https://crate.io/packages/pytest.oot/
 
-.. image:: https://pypip.in/d/pytest-oot/badge.png
+.. image:: https://img.shields.io/pypi/dm/pytest-oot.svg
     :target: https://crate.io/packages/pytest-oot/
 
 pytest-oot implements a simple way to write a test step for test engineers.
